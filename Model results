@@ -1,0 +1,20 @@
+#Random Forest Model
+Time Taken by Model: --- 8.291462182998657 seconds ---
+Average Accuracy:  0.8862500000000001
+Overall Confusion Matrix:
+ [[730  84]
+ [ 98 688]]
+
+#XGboost model 
+Time Taken by Model: --- 1.9933497905731201 seconds ---
+Average Accuracy:  0.9
+Overall Confusion Matrix:
+ [[749  65]
+ [ 95 691]]
+
+#SVM Model
+Time Taken by Model: --- 2.1811273097991943 seconds ---
+Average Accuracy:  0.865
+Overall Confusion Matrix:
+ [[721  93]
+ [123 663]]

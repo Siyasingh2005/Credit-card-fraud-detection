@@ -4,3 +4,39 @@ Credit card fraud detection has become increasingly critical with the rise in di
 # Dataset Description
 The dataset was taken from kaggle. This dataset includes credit card transactions conducted by European cardholders in 2023. It contains over 550,000 entries, with all personal information anonymized to safeguard the identities of the cardholders. The primary purpose of this dataset is to aid in the creation and testing of fraud detection models and algorithms to identify suspicious transactions.
 
+# Data preprocessing 
+In the preprocessing stage of data, some necessary steps were taken in preparation for training the machine learning model. First, irrelevant columns, such as 'class' identifiers, were removed from the dataset to eliminate features that are not contributing to the learning process. This simplifies the data, making the model more efficient and ensuring that only relevant attributes are considered. The dataset was carefully screened for missing values, and nothing was found missing: this ensured that no lapses occurred in the dataset. The dataset was divided into training and testing sets, as follows: 80% for training, and the remaining 20% for testing, aiming to ease the training and evaluation processes. Further, the numerical feature "amount" was examined thoroughly for outliers since extreme values may dramatically affect the prediction of the model and result in a poor outcome. Hence, with these preprocessing steps, the dataset is made suitable to machine learning that improves model accuracy and generalization.
+
+# MODEL CONSTRUCTION
+
+# RANDOM FOREST
+Credit card fraud detection leverages the Random Forest algorithm, implemented via Scikit-learn, to identify patterns and relationships within large datasets. As an ensemble learning technique, it combines multiple decision trees to enhance predictive accuracy while reducing overfitting. Key parameters, such as the number of trees, maximum depth, and minimum samples per leaf, were fine-tuned through hyperparameter optimization to balance model complexity and generalization. The dataset is binary, categorizing transactions as either fraudulent or genuine, and the model was tailored to address these two classes. Scikit-learn’s features simplified the integration and evaluation of the algorithm within the machine learning pipeline. The model's effectiveness was assessed using precision, recall, accuracy, F1 score, and the confusion matrix, ensuring a balanced approach to identifying fraud while managing false positives and false negatives
+
+# XGBOOST
+XGBoost, or eXtreme Gradient Boosting, is a powerful machine learning algorithm for classification, regression, and ranking tasks. It improves upon Gradient Boosting by incorporating ensemble techniques like bagging and boosting. Bagging creates multiple bootstrap samples for training, while boosting sequentially trains weak learners, correcting errors to enhance performance. XGBoost stands out for its speed, parallel computing capabilities, handling of missing data, and built-in cross-validation. With fewer parameters to tune, it minimizes overfitting through regularization, making it highly effective for solving complex, real-world problems efficiently
+
+# SVM
+Support Vector Machines (SVM) are effective for credit card fraud detection (CCFD), offering high accuracy with smaller datasets. However, their performance declines with larger datasets, limiting real-time applicability. Hybrid models combining SVM and Random Forest Classifier (RFC) improve fraud detection in high-dimensional, imbalanced datasets by enhancing accuracy (95%) and sensitivity (87%) while reducing false positives. Despite their success, these models face challenges with transaction privacy and scalability. Federated learning combined with artificial neural networks has been proposed to address these issues, ensuring privacy preservation and better handling of large datasets.
+
+# CROSS VALIDATION
+Repeated Stratified K-Fold Cross-Validation was employed to ensure a robust and unbiased evaluation of the Random Forest model's performance in credit card fraud detection. This approach uses 5 splits and 20 repetitions, preserving class distribution across each fold to prevent skewed representations. In each iteration, the model is trained on four folds and validated on the fifth, with this process repeated across all splits and cycles. By repeating the stratified cross-validation multiple times, this method provides a more reliable estimation of the model's generalization ability, ensuring consistent performance across various data subsets. This strategy enhances the robustness and trustworthiness of the evaluation process, making the methodology more reliable for detecting fraudulent transactions.
+
+# EVALUATION METRICS
+
+Five performance metrics were shown in this research paper to help us understand the models better and to select the best model for deployment.
+# Recall
+Recall, also known as sensitivity or the true positive rate, is a crucial metric in credit card fraud detection. It calculates the proportion of actual fraudulent transactions that are correctly identified by the model. High recall is vital to minimize false negatives, ensuring that fraudulent activities are detected and not overlooked. In fraud detection, where undetected fraud can have severe consequences, maximizing recall is essential.
+# Precision
+Precision refers to the ratio of correctly predicted fraudulent transactions to the total predicted as fraudulent. It measures the model's accuracy in classifying transactions as fraud. Achieving high precision is important to avoid false positives, where legitimate transactions are mistakenly flagged as fraudulent. Balancing precision and recall is key to building an effective fraud detection system that minimizes both false positives and false negatives.
+# Accuracy
+Accuracy measures the overall proportion of correct predictions (both fraudulent and non-fraudulent) out of all predictions made. While commonly used, accuracy can be misleading in imbalanced datasets, such as those in fraud detection, where fraudulent transactions are rare. Relying solely on accuracy might not provide a complete view of the model's effectiveness, making it essential to consider other metrics alongside it.
+# F1 Score
+The F1 score, the harmonic mean of precision and recall, is a valuable metric for credit card fraud detection.It provides a balanced evaluation by considering both false cons and false negatives. The F1 score is particularly useful when seeking a trade-off between precision and recall, ensuring that the model detects fraudulent transactions without unduly flagging legitimate ones.
+Confusion Matrix
+The confusion matrix is a powerful tool for assessing a model’s performance in fraud detection. It breaks down predictions into true positives, true negatives, false positives, and false negatives, offering a detailed view of the model's strengths and weaknesses. Analyzing the confusion matrix allows for further optimization by revealing the types of errors the model is making, leading to better adjustments and improvements.
+
+# RESULTS
+Model Performance Comparison
+The analysis tells that the XGBoost model has achieved the highest accuracy (90.00%), owing to its ability to effectively balance computational efficiency with advanced regularization techniques. Followed closely by Random Forest (88.62%) , showcasing its robustness through ensemble learning, which mitigates overfitting and captures intricate data relationships.  SVM (86.50%), SVM, while effective for smaller datasets, achieved an accuracy of 97.5% but struggled with scalability when applied to larger datasets, making it less suitable for real-time fraud detection scenarios. 
+Benefiting from its simplicity and effectiveness in identifying anomalies based on proximity measures, although its computational intensity for large datasets posed challenges.
+

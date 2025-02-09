@@ -296,7 +296,7 @@ for train_index, test_index in rkf.split(X, y):
     X_train_cv, X_test_cv = X.iloc[train_index], X.iloc[test_index]
     y_train_cv, y_test_cv = y.iloc[train_index], y.iloc[test_index]
 
-from sklearn.neighbors import KNeighborsClassifier  # Import KNN
+from sklearn.neighbors import KNeighborsClassifier  
 import time
 import numpy as np
 import pandas as pd
@@ -326,12 +326,12 @@ def buildAndRunModel(model, X_train, y_train, X_test, y_test):
     cm = confusion_matrix(y_test, y_pred)
     return accuracy, cm, model.predict_proba(X_test)[:, 1]
 ​
-# List of models to evaluate, including KNN
+# List of models to evaluate,
 models = [
     ("Random Forest", RandomForestClassifier()),
     ("XGBoost", XGBClassifier(eval_metric='logloss', use_label_encoder=False)),
     ("SVM", SVC(probability=True)),
-    ("KNN", KNeighborsClassifier())  # Adding KNN model
+    
 ]
 ​
 # Iterate through each model

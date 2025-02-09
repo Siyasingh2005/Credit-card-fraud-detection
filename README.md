@@ -1,2 +1,6 @@
 # Credit-card-fraud-detection
 Credit card fraud detection has become increasingly critical with the rise in digital payment methods.This study compares the performance of machine learning models—XGBoost, Random Forest, SVM, —for identifying fraudulent transactions. Data Preprocessing steps involved removing irrelevant features, addressing outliers, and splitting the data into training (80%) and testing (20%) sets. Performance metrics such as precision, recall, accuracy, F1 score, and confusion matrix were used to evaluate each model's effectiveness.These advanced models demonstrated the potential of machine learning to adapt to evolving fraudulent patterns, providing scalable and reliable fraud detection.The importance of advanced machine learning techniques in combating fraud, emphasizing the trade-offs between accuracy, scalability, and computational efficiency.
+
+# Dataset Description
+The dataset was taken from kaggle. This dataset includes credit card transactions conducted by European cardholders in 2023. It contains over 550,000 entries, with all personal information anonymized to safeguard the identities of the cardholders. The primary purpose of this dataset is to aid in the creation and testing of fraud detection models and algorithms to identify suspicious transactions.
+

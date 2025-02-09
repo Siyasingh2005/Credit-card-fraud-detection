@@ -1,0 +1,399 @@
+import numpy as np
+import pandas as pd
+import time
+​
+import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+%matplotlib inline
+import seaborn as sns
+ 
+from scipy import stats
+from scipy.stats import norm, skew
+from scipy.special import boxcox1p
+from scipy.stats import boxcox_normmax
+​
+from sklearn import preprocessing
+from sklearn.preprocessing import StandardScaler
+​
+import sklearn
+from sklearn import metrics
+from sklearn.metrics import roc_curve, auc, roc_auc_score
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import average_precision_score, precision_recall_curve
+​
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import cross_val_score
+​
+from sklearn.linear_model import Ridge, Lasso, LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from xgboost import plot_importance
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import train_test_split
+%pip install scikit-learn pandas numpy
+%pip install xgboost
+%pip install --upgrade imblearn
+​
+# To ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
+​
+# Loading the data
+df = pd.read_csv("C:\\Users\\darsh\\Desktop\\project\\credit 2023 project.csv")
+​
+print(df.head())
+
+#checking the shape
+df.shape
+
+#checking the class distribution of the target variable 
+df['Class'].value_counts()
+
+# Checking the class distribution of the target variable in percentage
+print((df.groupby('Class')['Class'].count() / df['Class'].count()) * 100)
+​
+# Plotting the class distribution as a pie chart
+(df.groupby('Class')['Class'].count() / df['Class'].count()).plot.pie(autopct='%1.1f%%', figsize=(7,7))
+​
+# Checking the % distribution of normal vs fraud
+classes = df['Class'].value_counts()
+normal_share = classes[0] / df['Class'].count() * 100
+fraud_share = classes[1] / df['Class'].count() * 100
+​
+# Printing the shares of normal and fraud
+print(normal_share)
+print(fraud_share)
+
+#Create a bar plot for the number and percentage of fraudulent vs non-fraudulent transcations
+plt.figure(figsize=(7,5))
+​
+sns.countplot(df['Class'])
+plt.title("Class Count", fontsize=18)
+​
+plt.xlabel("Record counts by class", fontsize=15)
+plt.ylabel("Count", fontsize=15)
+​
+plt.show()
+
+#checking the datatypes and null/not-null distribution
+df.info()
+
+checking distribution of numerical values in the dataset
+df.describe()
+
+#Checking the correlation in heatmap
+plt.figure(figsize=(24, 18))  
+sns.heatmap(corr, cmap="coolwarm", annot=True, fmt=".2f")  # Annotate values
+plt.title('Correlation Heatmap')  # Add a title
+plt.show()
+
+#Splitting the dataset into X and y
+y = df['Class']  # Assuming 'Class' is the target column
+X = df.drop(['Class'], axis=1)  # Dropping the 'Class' column from X
+
+splitting the dataset using train test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state = 100, test_size = 0.20)
+
+#plot the histogram of a variable from the dataset to see the skewness
+normal_records = df.Class == 0
+fraud_records = df.Class == 1
+​
+plt.figure(figsize=(20, 60))
+for n, col in enumerate(cols):
+    plt.subplot(10, 3, n+1)
+    sns.distplot(X[col][normal_records], color='green')
+    sns.distplot(X[col][fraud_records], color='red')
+    plt.title(col, fontsize=17)
+​
+plt.show() 
+
+# created a common function to plot confusion matrix
+def Plot_confusion_matrix(y_test, pred_test):
+    cm = confusion_matrix(y_test, pred_test)
+    plt.clf()
+​
+    plt.imshow(cm, interpolation='nearest', cmap=plt.cm.Accent)
+    categoryNames = ['Non-Fraudalent', 'Fraudalent']
+​
+    plt.title('Confusion Matrix - Test Data')
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+​
+    ticks = np.arange(len(categoryNames))
+    plt.xticks(ticks, categoryNames, rotation=45)
+    plt.yticks(ticks, categoryNames)
+​
+    s = [['TN', 'FP'], ['FN', 'TP']]
+    for i in range(2):
+        for j in range(2):
+            plt.text(j, i, str(s[i][j]) + ' = ' + str(cm[i][j]), fontsize=12)
+​
+    plt.show()
+
+ Create a common function to fit and predict on a KNN model
+def buildAndRunKNNModels(df_Results, Methodology, X_train, y_train, X_test, y_test):
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn import metrics
+    from sklearn.metrics import classification_report, confusion_matrix
+    import matplotlib.pyplot as plt
+    import numpy as np
+​
+    # Create KNN model and fit the model with training dataset
+    knn = KNeighborsClassifier(n_neighbors=5, n_jobs=16)
+    knn.fit(X_train, y_train)
+    score = knn.score(X_test, y_test)
+    print("Model score: ", score)
+​
+    # Accuracy
+    y_pred = knn.predict(X_test)
+    KNN_Accuracy = metrics.accuracy_score(y_pred, y_test)
+    print("Accuracy: ", KNN_Accuracy)
+    
+    # Confusion Matrix
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_test, y_pred))
+    
+    # Classification Report
+    print("Classification Report:")
+    print(classification_report(y_test, y_pred))
+​
+    # Predict probabilities
+    knn_probs = knn.predict_proba(X_test)[:, 1]
+​
+    # Calculate ROC AUC
+    knn_roc_value = metrics.roc_auc_score(y_test, knn_probs)
+    print("KNN ROC value: {}".format(knn_roc_value))
+​
+    # Compute ROC curve
+    fpr, tpr, thresholds = metrics.roc_curve(y_test, knn_probs)
+    threshold = thresholds[np.argmax(tpr - fpr)]  # Find optimal threshold
+    print("KNN threshold: {}".format(threshold))
+    
+    # Calculate the ROC AUC
+    roc_auc = metrics.auc(fpr, tpr)
+    print("ROC for the test dataset: {:.1f}".format(roc_auc))
+​
+    # Plot the ROC curve
+    plt.plot(fpr, tpr, label="Test, auc=" + str(roc_auc))
+    plt.legend(loc=4)
+    plt.show()
+​
+    # Append the results to the dataframe
+    df_Results = df_Results.append(pd.DataFrame({
+        'Methodology': Methodology,
+        'Model': 'KNN',
+        'Accuracy': KNN_Accuracy,
+        'roc_value': knn_roc_value
+    }), ignore_index=True)
+​
+    return df_Results
+​def buildAndRunRandomForestModels(Results, Methodology, X_train, y_train, X_test, y_test):
+  # Evaluate Random Forest model
+  # Create the model with 100 trees
+  RF_model = RandomForestClassifier(n_estimators=100,
+                                    bootstrap=True,
+                                    max_features='sqrt', random_state=42)
+​
+  # Fit on training data
+  RF_model.fit(X_train, y_train)
+​
+  # Make predictions on the testing data
+  y_pred = RF_model.predict(X_test)
+​
+  # Model Evaluation
+  accuracy = accuracy_score(y_test, y_pred)
+  print("Model Accuracy:", accuracy)
+​
+  # Confusion matrix
+  cm = confusion_matrix(y_test, y_pred)
+  print("Confusion Matrix:\n", cm)
+​
+  # Classification report
+  cr = classification_report(y_test, y_pred)
+  print("Classification Report:\n", cr)
+​
+  # ROC AUC score
+  roc_auc = roc_auc_score(y_test, RF_model.predict_proba(X_test)[:, 1])  # More efficient way
+​
+  print("ROC AUC Score:", roc_auc)
+​
+  # ROC Curve
+  fpr, tpr, thresholds = metrics.roc_curve(y_test, RF_model.predict_proba(X_test)[:, 1])
+  threshold = thresholds[np.argmax(tpr - fpr)]
+​
+  print("Random Forest threshold:", threshold)
+  roc_auc = metrics.auc(fpr, tpr)
+  print("ROC for the test dataset:", roc_auc)
+​
+  plt.legend(loc=4)
+  plt.show()
+​
+  # Append results to DataFrame (assuming df_Results is defined)
+  df_Results = df_Results.append(pd.DataFrame({'Methodology': Methodology, 'Model': 'Random Forest', 'Accuracy': accuracy, 'roc': roc_auc, 'threshold': threshold}), ignore_index=True)
+  return df_Results
+In [42]:
+xxxxxxxxxx
+ 
+def buildAndRunSVMModels(df_Results, Methodology, X_train, y_train, X_test, y_test):
+​
+    # Create and train the SVM model
+    clf = SVC(kernel='sigmoid', random_state=42)
+    clf.fit(X_train, y_train)
+​
+    # Make predictions on the test data
+    y_pred_SVM = clf.predict(X_test)
+​
+    # Evaluate the model
+    SVM_Score = accuracy_score(y_test, y_pred_SVM)
+    print("accuracy_score: {0}".format(SVM_Score))
+    print("Confusion Matrix")
+    Plot_confusion_matrix(y_test, y_pred_SVM)
+    print("classification Report")
+    print(classification_report(y_test, y_pred_SVM))
+​
+    # Calculate ROC AUC
+    svm_probs = clf.predict_proba(X_test)[:, 1]
+    roc_value = roc_auc_score(y_test, svm_probs)
+​
+    print("SVM roc_value: {0}".format(roc_value))
+​
+    fpr, tpr, thresholds = metrics.roc_curve(y_test, svm_probs)
+​
+    threshold = thresholds[np.argmax(tpr - fpr)]
+    print("SVM threshold: {0}".format(threshold))
+​
+    roc_auc = metrics.auc(fpr, tpr)
+    print("ROC for the test dataset: {0:.1f}".format(roc_auc))
+​
+    plt.plot(fpr, tpr, label="Test, auc=" + str(roc_auc))
+    plt.legend(loc=4)
+    plt.show()
+​
+    # Append results to DataFrame
+    df_Results = df_Results.append(pd.DataFrame({'Methodology': Methodology, 'Model': 'SVM',
+                                                'Accuracy': SVM_Score, 'roc_value': roc_value}),
+                                  ignore_index=True)
+​
+    return df_Results
+
+from sklearn.model_selection import RepeatedKFold
+​
+# Create a RepeatedKFold object with 5 splits and 10 repeats
+rkf = RepeatedKFold(n_splits=5, n_repeats=10, random_state=None)
+​
+# Assuming X is the feature set and y is the target variable
+for train_index, test_index in rkf.split(X, y):
+    print("TRAIN:", train_index, "TEST:", test_index)
+​
+    # Split the data into training and testing sets
+    X_train_cv, X_test_cv = X.iloc[train_index], X.iloc[test_index]
+    y_train_cv, y_test_cv = y.iloc[train_index], y.iloc[test_index]
+
+from sklearn.neighbors import KNeighborsClassifier  # Import KNN
+import time
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split, RepeatedKFold
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, roc_curve, auc
+import seaborn as sns
+​
+# Create a sample dataset for demonstration
+X, y = make_classification(n_samples=1000, n_features=20, n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+​
+# Initialize RepeatedKFold
+rkf = RepeatedKFold(n_splits=5, n_repeats=2, random_state=42)
+​
+# Initialize results DataFrame
+df_Results = pd.DataFrame(columns=['Model', 'Accuracy'])
+​
+def buildAndRunModel(model, X_train, y_train, X_test, y_test):
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    cm = confusion_matrix(y_test, y_pred)
+    return accuracy, cm, model.predict_proba(X_test)[:, 1]
+​
+# List of models to evaluate, including KNN
+models = [
+    ("Random Forest", RandomForestClassifier()),
+    ("XGBoost", XGBClassifier(eval_metric='logloss', use_label_encoder=False)),
+    ("SVM", SVC(probability=True)),
+    ("KNN", KNeighborsClassifier())  # Adding KNN model
+]
+​
+# Iterate through each model
+for model_name, model in models:
+    print(f"{model_name} Model")
+    start_time = time.time()
+    accuracies = []
+    confusion_matrices = []
+    y_scores_all = []
+    y_true_all = []  # To store true labels for ROC calculation
+​
+    for train_index, test_index in rkf.split(X_train):
+        X_train_cv, X_test_cv = X_train[train_index], X_train[test_index]
+        y_train_cv, y_test_cv = y_train[train_index], y_train[test_index]
+        
+        accuracy, cm, y_scores = buildAndRunModel(model, X_train_cv, y_train_cv, X_test_cv, y_test_cv)
+        accuracies.append(accuracy)
+        confusion_matrices.append(cm)
+        y_scores_all.append(y_scores)
+        y_true_all.append(y_test_cv)  # Collect true labels
+​
+    avg_accuracy = np.mean(accuracies)
+    overall_cm = sum(confusion_matrices)
+​
+    print("Time Taken by Model: --- %s seconds ---" % (time.time() - start_time))
+    print("Average Accuracy: ", avg_accuracy)
+    print("Overall Confusion Matrix:\n", overall_cm)
+    
+    # Calculate ROC curve
+    y_scores_all = np.concatenate(y_scores_all)
+    y_true_all = np.concatenate(y_true_all)  # Concatenate true labels
+    fpr, tpr, _ = roc_curve(y_true_all, y_scores_all)
+    roc_auc = auc(fpr, tpr)
+​
+    # Plot ROC curve
+    plt.figure()
+    plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='red', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(f'ROC Curve - {model_name}')
+    plt.legend(loc='lower right')
+    plt.show()
+​
+    # Plot confusion matrix
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(overall_cm , annot=True, fmt='d', cmap='Blues', cbar=False)
+    plt.title(f'Confusion Matrix - {model_name}')
+    plt.xlabel('Predicted Label')
+    plt.ylabel('True Label')
+    plt.show()
+​
+    # Append results to DataFrame
+    df_Results = pd.concat([df_Results, pd.DataFrame({'Model': [model_name], 'Accuracy': [avg_accuracy]})], ignore_index=True)
+​
+# Final Results
+print("Final Results:")
+print(df_Results)
+
+# Final Results
+print("Final Results:")
+print(df_Results)
+Final Results:
